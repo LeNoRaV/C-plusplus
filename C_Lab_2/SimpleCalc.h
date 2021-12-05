@@ -1,9 +1,11 @@
-#ifndef CALC_H
-#define CALC_H
+#ifndef SIMPLECALC_H
+#define SIMPLECALC_H
 #include <QMainWindow>
 #include <QToolButton>
 #include <QLineEdit>
 #include <QGridLayout>
+#include <QDialog>
+#include <QRadioButton>
 
 class Button : public QToolButton
 {
@@ -15,12 +17,12 @@ public:
     QSize sizeHint() const;
 };
 
-class Calculator : public QMainWindow
+class SimpleCalculator : public QDialog
  {
      Q_OBJECT
 
  public:
-     Calculator(QWidget *parent = 0);
+     SimpleCalculator(QWidget *parent = 0);
 
  private slots:
      void digitClicked();
@@ -29,9 +31,6 @@ class Calculator : public QMainWindow
      void multiplicativeOperatorClicked();
      void equalClicked();
      void pointClicked();
-     void changeSignClicked();
-     void backspaceClicked();
-     void clear();
      void clearAll();
      void clearMemory();
      void readMemory();
@@ -52,4 +51,5 @@ private:
      Button *digitButtons[NumDigitButtons];
 };
 
-#endif // CALC_H
+
+#endif // SIMPLECALC_H
