@@ -28,8 +28,9 @@ SimpleCalculator::SimpleCalculator(QWidget *parent)
      QString StyleSheetNumbers = "QToolButton { color: black; background-color: #FAFAFA; border: none; font: 17pt 'Microsoft YaHei UI'; outline: none;} QToolButton:hover { background-color: #D8D8D8; border-style: solid; border-width: 3px; border-color: #F2F2F2; } QToolButton:pressed { background-color: #A4A4A4; border-style: solid; border-width: 3px; border-color: #E6E6E6; }";
      QString StyleSheetSigns =   "QToolButton { color: black; background-color: #E6E6E6; border: none; font: 19pt 'Microsoft YaHei UI Light'; outline: none; } QToolButton:hover { background-color: #2ECCFA; border-style: solid; border-width: 3px; border-color: #58D3F7; } QToolButton:pressed { background-color: #81DAF5; border-style: solid; border-width: 3px; border-color: #A9E2F3; }";
 
-     QRadioButton *radioSButton = new QRadioButton("Simple Calculator");
-     QRadioButton *radioEButton = new QRadioButton("Engineering Calculator");
+     simpleCalc = new QRadioButton("Simple Calculator");
+     simpleCalc->setChecked(true);
+     engineeringCalc = new QRadioButton("Engineering Calculator");
 
 
      Button *pointButton = createButton(tr("."), SLOT(pointClicked()));
@@ -42,11 +43,16 @@ SimpleCalculator::SimpleCalculator(QWidget *parent)
      Button *reciprocalButton = createButton(tr("1/x"), SLOT(unaryOperatorClicked()));
      Button *equalButton = createButton(tr("="), SLOT(equalClicked()));
 
-     QGridLayout *mainLayout = new QGridLayout;
-     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+     mainLayout = new QGridLayout(this);
+     mainLayout->setSpacing(0);
+     mainLayout->setContentsMargins(0, 0, 0, 0);
 
-     mainLayout->addWidget(radioSButton, 1, 0, 1, 4);
-     mainLayout->addWidget(radioEButton, 2, 0, 1, 4);
+//     simpleCalcLayout = new QGridLayout(this);
+//     simpleCalcLayout->setSpacing(0);
+//     simpleCalcLayout->setContentsMargins(0, 0, 0, 0);
+
+     mainLayout->addWidget(simpleCalc, 1, 0, 1, 4);
+     mainLayout->addWidget(engineeringCalc, 2, 0, 1, 4);
      mainLayout->addWidget(display, 0, 0, 1, 5);
      mainLayout->addWidget(clearAllButton, 1, 4, 2, 1);
 
@@ -69,8 +75,8 @@ SimpleCalculator::SimpleCalculator(QWidget *parent)
 
      display->setStyleSheet(StyleSheetLine);
      digitButtons[0] -> setStyleSheet(StyleSheetNumbers);
-     radioSButton->setStyleSheet(StyleSheetRadioButton);
-     radioEButton->setStyleSheet(StyleSheetRadioButton);
+     simpleCalc->setStyleSheet(StyleSheetRadioButton);
+     engineeringCalc->setStyleSheet(StyleSheetRadioButton);
      squareRootButton->setStyleSheet(StyleSheetSigns);
      reciprocalButton->setStyleSheet(StyleSheetSigns);
      equalButton->setStyleSheet(StyleSheetSigns);
@@ -94,7 +100,8 @@ void SimpleCalculator::digitClicked()
          return;
 
      if (waitingForOperand) {
-         if (display->text() == "0") display->clear();
+         //if (display->text() == "0") display->clear();
+         display->clear();
          waitingForOperand = false;
      }
      display->setText(display->text() + QString::number(digitValue));
@@ -151,7 +158,7 @@ void SimpleCalculator::additiveOperatorClicked()
      }
      pendingAdditiveOperator = clickedOperator;
      waitingForOperand = true;
-     display->setText(display->text() + QString(clickedOperator));
+     //display->setText(display->text() + QString(clickedOperator));
  }
 
 void SimpleCalculator::multiplicativeOperatorClicked()
@@ -172,7 +179,7 @@ void SimpleCalculator::multiplicativeOperatorClicked()
 
     pendingMultiplicativeOperator = clickedOperator;
     waitingForOperand = true;
-    display->setText(display->text() + QString(clickedOperator));
+    //display->setText(display->text() + QString(clickedOperator));
 }
 
 void SimpleCalculator::equalClicked()

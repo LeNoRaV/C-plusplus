@@ -36,7 +36,15 @@ class SimpleCalculator : public QDialog
      void readMemory();
      void setMemory();
      void addToMemory();
-private:
+
+protected:
+     QGridLayout* simpleCalcLayout;
+     QGridLayout* EngCalcLayout;
+     QGridLayout* mainLayout;
+
+     QRadioButton *simpleCalc;
+     QRadioButton *engineeringCalc;
+
      Button *createButton(const QString &text, const char *member);
      void abortOperation();
      bool calculate(double rightOperand, const QString &pendingOperator);

@@ -17,24 +17,8 @@ class EngineeringCalculator : public SimpleCalculator
      EngineeringCalculator(QWidget *parent = 0);
 
  private slots:
-     /*
-     void sinhClicked();
-     void coshOperatorClicked();
-     void tanhClicked();
-     void factClicked();
-     void sinClicked();
-     void cosClicked();
-     void tanClicked();
-     void piClicked();
-     void expClicked();
-     void lnClicked();
-     void logClicked();
-     void kubsqrtClicked();
-     void to2Clicked();
-     void to3Clicked();
-     void toyClicked();
-     void ysqrtClicked();
-     */
+     void unaryOperatorClickedEng();
+
 private:
 
 };
