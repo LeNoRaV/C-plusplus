@@ -20,6 +20,15 @@ class EngineeringCalculator : public SimpleCalculator
      void unaryOperatorClickedEng();
 
 private:
+     //QGridLayout* EngCalcLayout;
+
+//     void SpawnSimpleMode();
+//     void SpawnComplMode();
+
+public slots:
+//     void SwitchMode();
+//     void mode_usual(bool a);
+//     void mode_engineering(bool a);
 
 };
 

@@ -5,7 +5,7 @@
 
 
 SimpleCalculator::SimpleCalculator(QWidget *parent)
-     : QDialog(parent)
+     : QWidget(parent)
  {
      sumInMemory = 0.0;
      sumSoFar = 0.0;
@@ -14,7 +14,7 @@ SimpleCalculator::SimpleCalculator(QWidget *parent)
      display = new QLineEdit("0");
      display->setReadOnly(true);
      display->setAlignment(Qt::AlignRight);
-     display->setMaxLength(15);
+     //display->setMaxLength(15);
 
      QFont font = display->font();
      font.setPointSize(font.pointSize() + 8);
@@ -43,35 +43,31 @@ SimpleCalculator::SimpleCalculator(QWidget *parent)
      Button *reciprocalButton = createButton(tr("1/x"), SLOT(unaryOperatorClicked()));
      Button *equalButton = createButton(tr("="), SLOT(equalClicked()));
 
-     mainLayout = new QGridLayout(this);
-     mainLayout->setSpacing(0);
-     mainLayout->setContentsMargins(0, 0, 0, 0);
+     simpleCalcLayout = new QGridLayout(this);
+     simpleCalcLayout->setSpacing(0);
+     simpleCalcLayout->setContentsMargins(0, 0, 0, 0);
 
-//     simpleCalcLayout = new QGridLayout(this);
-//     simpleCalcLayout->setSpacing(0);
-//     simpleCalcLayout->setContentsMargins(0, 0, 0, 0);
-
-     mainLayout->addWidget(simpleCalc, 1, 0, 1, 4);
-     mainLayout->addWidget(engineeringCalc, 2, 0, 1, 4);
-     mainLayout->addWidget(display, 0, 0, 1, 5);
-     mainLayout->addWidget(clearAllButton, 1, 4, 2, 1);
+     simpleCalcLayout->addWidget(simpleCalc, 1, 0, 1, 4);
+     simpleCalcLayout->addWidget(engineeringCalc, 2, 0, 1, 4);
+     simpleCalcLayout->addWidget(display, 0, 0, 1, 5);
+     simpleCalcLayout->addWidget(clearAllButton, 1, 4, 2, 1);
 
      for (int i = 1; i < NumDigitButtons; ++i) {
          int row = ((9 - i) / 3) + 3;
          int column = ((i - 1) % 3);
-         mainLayout->addWidget(digitButtons[i], row, column);
+         simpleCalcLayout->addWidget(digitButtons[i], row, column);
          digitButtons[i] -> setStyleSheet(StyleSheetNumbers);
      }
 
-     mainLayout->addWidget(digitButtons[0], 6, 0, 1, 2);
-     mainLayout->addWidget(pointButton, 6, 2);
-     mainLayout->addWidget(divisionButton, 3, 3);
-     mainLayout->addWidget(timesButton, 4, 3);
-     mainLayout->addWidget(minusButton, 5, 3);
-     mainLayout->addWidget(plusButton, 6, 3);
-     mainLayout->addWidget(squareRootButton, 3, 4);
-     mainLayout->addWidget(reciprocalButton, 4, 4);
-     mainLayout->addWidget(equalButton, 5, 4, 2, 1);
+     simpleCalcLayout->addWidget(digitButtons[0], 6, 0, 1, 2);
+     simpleCalcLayout->addWidget(pointButton, 6, 2);
+     simpleCalcLayout->addWidget(divisionButton, 3, 3);
+     simpleCalcLayout->addWidget(timesButton, 4, 3);
+     simpleCalcLayout->addWidget(minusButton, 5, 3);
+     simpleCalcLayout->addWidget(plusButton, 6, 3);
+     simpleCalcLayout->addWidget(squareRootButton, 3, 4);
+     simpleCalcLayout->addWidget(reciprocalButton, 4, 4);
+     simpleCalcLayout->addWidget(equalButton, 5, 4, 2, 1);
 
      display->setStyleSheet(StyleSheetLine);
      digitButtons[0] -> setStyleSheet(StyleSheetNumbers);
@@ -87,7 +83,7 @@ SimpleCalculator::SimpleCalculator(QWidget *parent)
      clearAllButton->setStyleSheet(StyleSheetSigns);
      pointButton->setStyleSheet(StyleSheetSigns);
 
-     setLayout(mainLayout);
+     setLayout(simpleCalcLayout);
 
      setWindowTitle(tr("Simple Calculator"));
  }

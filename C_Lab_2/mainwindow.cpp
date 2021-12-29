@@ -1,14 +1,14 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    CreateDefaultCalcWidget();
+//    CreateDefaultCalcWidget();
     CreateSimpleCalcWidget();
     CreateEngineeringWidget();
 
-    mainWidget = new QWidget;
+//    mainWidget = new QWidget;
 }
 
 MainWindow::~MainWindow()
@@ -16,156 +16,257 @@ MainWindow::~MainWindow()
     //delete ui;
 }
 
-void MainWindow::CreateDefaultCalcWidget(){
-    sumInMemory = 0.0;
-    sumSoFar = 0.0;
-    factorSoFar = 0.0;
-    waitingForOperand = true;
-    display = new QLineEdit("0");
-    display->setReadOnly(true);
-    display->setAlignment(Qt::AlignRight);
-    display->setMaxLength(15);
-
-    QFont font = display->font();
-    font.setPointSize(font.pointSize() + 8);
-    display->setFont(font);
-
-    QString StyleSheetLine = "QLineEdit {font: 26pt 'Microsoft YaHei UI'; qproperty-alignment: AlignRight; padding: 5px; border: none; background-color: #F2F2F2;}";
-    QString StyleSheetRadioButton = "QRadioButton {background-color: #E6E6E6; font: 10pt 'Microsoft YaHei UI Light'; padding: 0px 0px 0px 20px;} QRadioButton::indicator { width: 15px; height: 15px;}";
-
-    simpleCalc = new QRadioButton("Simple Calculator");
-    simpleCalc->setChecked(true);
-    engineeringCalc = new QRadioButton("Engineering Calculator");
-
-    defaultCalcLayout = new QGridLayout(this);
-    defaultCalcLayout->setSpacing(0);
-    defaultCalcLayout->setContentsMargins(0, 0, 0, 0);
-
-    defaultCalcLayout->addWidget(simpleCalc, 1, 0, 1, 4);
-    defaultCalcLayout->addWidget(engineeringCalc, 2, 0, 1, 4);
-    defaultCalcLayout->addWidget(display, 0, 0, 1, 5);
-
-    defaultCalcWidget = new QWidget(this);
-    defaultCalcWidget->setLayout(defaultCalcLayout);
-
-    display->setStyleSheet(StyleSheetLine);
-    simpleCalc->setStyleSheet(StyleSheetRadioButton);
-    engineeringCalc->setStyleSheet(StyleSheetRadioButton);
-
-}
 void MainWindow::CreateSimpleCalcWidget(){
-    sumInMemory = 0.0;
+    SimpleCalculator calc;
+}
+
+void MainWindow::CreateEngineeringWidget(){
+    EngineeringCalculator calc;
+}
+/*
+
+void MainWindow::SpawnSimpleMode(){
+    mainLayout = new QGridLayout;
+        mainLayout->setSpacing(0);
+        engineeringWidget->hide();
+        mainLayout->addWidget(defaultCalcWidget, 0, 0, 1, 3);
+        mainLayout->addWidget(simpleCalcWidget,  1, 0, 2, 3);
+
+        mainWidget->setLayout(mainLayout);
+        setCentralWidget(mainWidget);
+        centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
+}
+void MainWindow::SpawnEngineeringMode(){
+    mainLayout = new QGridLayout;
+        mainLayout->setSpacing(0);
+        mainLayout->addWidget(defaultCalcWidget, 0, 0, 1, 9);
+        mainLayout->addWidget(engineeringWidget,   1, 0, 2, 4);
+        mainLayout->addWidget(simpleCalcWidget,  1, 4, 2, 5);
+        engineeringWidget->show();
+
+        mainWidget->setLayout(mainLayout);
+        setCentralWidget(mainWidget);
+        centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
+}
+
+void MainWindow::SwitchMode(){
+    mainWidget->setParent(this);
+        simpleCalcWidget->setParent(this);
+        engineeringWidget->setParent(this);
+        if (simpleCalc->isChecked()) {
+            delete mainLayout;
+            setMinimumSize(685, 450);
+            setMaximumSize(685, 450);
+            SpawnEngineeringMode();
+        }
+        else {
+            delete mainLayout;
+            setMinimumSize(380, 450);
+            setMaximumSize(380, 450);
+            SpawnSimpleMode();
+        }
+}
+
+void MainWindow::digitClicked()
+ {
+     Button *clickedButton = qobject_cast<Button *>(sender());
+     int digitValue = clickedButton->text().toInt();
+     if (display->text() == "0" && digitValue == 0.0)
+         return;
+
+     if (waitingForOperand) {
+         //if (display->text() == "0") display->clear();
+         display->clear();
+         waitingForOperand = false;
+     }
+     display->setText(display->text() + QString::number(digitValue));
+ }
+
+void MainWindow::unaryOperatorClicked()
+ {
+     Button *clickedButton = qobject_cast<Button *>(sender());
+     QString clickedOperator = clickedButton->text();
+     double operand = display->text().toDouble();
+     double result = 0.0;
+
+     if (clickedOperator == tr("Sqrt")) {
+         if (operand < 0.0) {
+             abortOperation();
+             return;
+         }
+         result = sqrt(operand);
+     }
+     else if (clickedOperator == tr("1/x")) {
+         if (operand == 0.0) {
+             abortOperation();
+             return;
+         }
+         result = 1.0 / operand;
+     }
+     display->setText(QString::number(result));
+     waitingForOperand = true;
+ }
+
+void MainWindow::additiveOperatorClicked()
+ {
+     Button *clickedButton = qobject_cast<Button *>(sender());
+     QString clickedOperator = clickedButton->text();
+     double operand = display->text().toDouble();
+     if (!pendingMultiplicativeOperator.isEmpty()) {
+         if (!calculate(operand, pendingMultiplicativeOperator)) {
+             abortOperation();
+             return;
+         }
+         display->setText(QString::number(factorSoFar));
+         operand = factorSoFar;
+         factorSoFar = 0.0;
+         pendingMultiplicativeOperator.clear();
+     }
+     if (!pendingAdditiveOperator.isEmpty()) {
+         if (!calculate(operand, pendingAdditiveOperator)) {
+             abortOperation();
+             return;
+         }
+         display->setText(QString::number(sumSoFar));
+     } else {
+         sumSoFar = operand;
+     }
+     pendingAdditiveOperator = clickedOperator;
+     waitingForOperand = true;
+     //display->setText(display->text() + QString(clickedOperator));
+ }
+
+void MainWindow::multiplicativeOperatorClicked()
+{
+    Button *clickedButton = qobject_cast<Button *>(sender());
+    QString clickedOperator = clickedButton->text();
+    double operand = display->text().toDouble();
+
+    if (!pendingMultiplicativeOperator.isEmpty()) {
+        if (!calculate(operand, pendingMultiplicativeOperator)) {
+            abortOperation();
+            return;
+        }
+        display->setText(QString::number(factorSoFar));
+    } else {
+        factorSoFar = operand;
+    }
+
+    pendingMultiplicativeOperator = clickedOperator;
+    waitingForOperand = true;
+    //display->setText(display->text() + QString(clickedOperator));
+}
+
+void MainWindow::equalClicked()
+{
+    double operand = display->text().toDouble();
+
+    if (!pendingMultiplicativeOperator.isEmpty()) {
+        if (!calculate(operand, pendingMultiplicativeOperator)) {
+            abortOperation();
+            return;
+        }
+        operand = factorSoFar;
+        factorSoFar = 0.0;
+        pendingMultiplicativeOperator.clear();
+    }
+    if (!pendingAdditiveOperator.isEmpty()) {
+        if (!calculate(operand, pendingAdditiveOperator)) {
+            abortOperation();
+            return;
+        }
+        pendingAdditiveOperator.clear();
+    } else {
+        sumSoFar = operand;
+    }
+
+    display->setText(QString::number(sumSoFar));
+    sumSoFar = 0.0;
+    waitingForOperand = true;
+}
+
+void MainWindow::pointClicked()
+ {
+     if (waitingForOperand)
+         display->setText("0");
+     if (!display->text().contains("."))
+         display->setText(display->text() + tr("."));
+     waitingForOperand = false;
+ }
+
+void MainWindow::clearAll()
+{
     sumSoFar = 0.0;
     factorSoFar = 0.0;
+    pendingAdditiveOperator.clear();
+    pendingMultiplicativeOperator.clear();
+    display->setText("0");
     waitingForOperand = true;
-    display = new QLineEdit("0");
-    display->setReadOnly(true);
-    display->setAlignment(Qt::AlignRight);
-    display->setMaxLength(15);
-
-    QFont font = display->font();
-    font.setPointSize(font.pointSize() + 8);
-    display->setFont(font);
-    for (int i = 0; i < NumDigitButtons; ++i) {
-        digitButtons[i] = createButton(QString::number(i), SLOT(digitClicked()));
-    }
-
-    QString StyleSheetNumbers = "QToolButton { color: black; background-color: #FAFAFA; border: none; font: 17pt 'Microsoft YaHei UI'; outline: none;} QToolButton:hover { background-color: #D8D8D8; border-style: solid; border-width: 3px; border-color: #F2F2F2; } QToolButton:pressed { background-color: #A4A4A4; border-style: solid; border-width: 3px; border-color: #E6E6E6; }";
-    QString StyleSheetSigns =   "QToolButton { color: black; background-color: #E6E6E6; border: none; font: 19pt 'Microsoft YaHei UI Light'; outline: none; } QToolButton:hover { background-color: #2ECCFA; border-style: solid; border-width: 3px; border-color: #58D3F7; } QToolButton:pressed { background-color: #81DAF5; border-style: solid; border-width: 3px; border-color: #A9E2F3; }";
-
-    simpleCalc = new QRadioButton("Simple Calculator");
-    simpleCalc->setChecked(true);
-    engineeringCalc = new QRadioButton("Engineering Calculator");
-
-
-    Button *pointButton = createButton(tr("."), SLOT(pointClicked()));
-    Button *clearAllButton = createButton(tr("C"), SLOT(clearAll()));
-    Button *divisionButton = createButton(tr("/"), SLOT(multiplicativeOperatorClicked()));
-    Button *timesButton = createButton(tr("*"), SLOT(multiplicativeOperatorClicked()));
-    Button *minusButton = createButton(tr("-"), SLOT(additiveOperatorClicked()));
-    Button *plusButton = createButton(tr("+"), SLOT(additiveOperatorClicked()));
-    Button *squareRootButton = createButton(tr("Sqrt"), SLOT(unaryOperatorClicked()));
-    Button *reciprocalButton = createButton(tr("1/x"), SLOT(unaryOperatorClicked()));
-    Button *equalButton = createButton(tr("="), SLOT(equalClicked()));
-
-    simpleCalcLayout = new QGridLayout(this);
-    simpleCalcLayout->setSpacing(0);
-    simpleCalcLayout->setContentsMargins(0, 0, 0, 0);
-
-    simpleCalcLayout->addWidget(clearAllButton, 1, 4, 2, 1);
-
-    for (int i = 1; i < NumDigitButtons; ++i) {
-        int row = ((9 - i) / 3) + 3;
-        int column = ((i - 1) % 3);
-        mainLayout->addWidget(digitButtons[i], row, column);
-        digitButtons[i] -> setStyleSheet(StyleSheetNumbers);
-    }
-
-    simpleCalcLayout->addWidget(digitButtons[0], 6, 0, 1, 2);
-    simpleCalcLayout->addWidget(pointButton, 6, 2);
-    simpleCalcLayout->addWidget(divisionButton, 3, 3);
-    simpleCalcLayout->addWidget(timesButton, 4, 3);
-    simpleCalcLayout->addWidget(minusButton, 5, 3);
-    simpleCalcLayout->addWidget(plusButton, 6, 3);
-    simpleCalcLayout->addWidget(squareRootButton, 3, 4);
-    simpleCalcLayout->addWidget(reciprocalButton, 4, 4);
-    simpleCalcLayout->addWidget(equalButton, 5, 4, 2, 1);
-
-    digitButtons[0] -> setStyleSheet(StyleSheetNumbers);
-    squareRootButton->setStyleSheet(StyleSheetSigns);
-    reciprocalButton->setStyleSheet(StyleSheetSigns);
-    equalButton->setStyleSheet(StyleSheetSigns);
-    divisionButton->setStyleSheet(StyleSheetSigns);
-    timesButton->setStyleSheet(StyleSheetSigns);
-    minusButton->setStyleSheet(StyleSheetSigns);
-    plusButton->setStyleSheet(StyleSheetSigns);
-    clearAllButton->setStyleSheet(StyleSheetSigns);
-    pointButton->setStyleSheet(StyleSheetSigns);
-
-    simpleCalcWidget = new QWidget(this);
-    simpleCalcWidget->setLayout(simpleCalcLayout);
-
-    setWindowTitle(tr("Simple Calculator"));
-}
-void MainWindow::CreateEngineeringWidget(){
-
-    engineeringCalc->setChecked(true);
-
-    QString StyleSheetSigns = "QToolButton { color: black; background-color: #E6E6E6; border: none; font: 19pt 'Microsoft YaHei UI Light'; outline: none; } QToolButton:hover { background-color: #2ECCFA; border-style: solid; border-width: 3px; border-color: #58D3F7; } QToolButton:pressed { background-color: #81DAF5; border-style: solid; border-width: 3px; border-color: #A9E2F3; }";
-
-    Button *sinhButton = createButton(tr("sinh"), SLOT(unaryOperatorClickedEng()));
-    Button *coshAllButton = createButton(tr("cosh"), SLOT(unaryOperatorClickedEng()));
-    Button *tanhButton = createButton(tr("tanh"), SLOT(unaryOperatorClickedEng()));
-    Button *sinButton = createButton(tr("sin"), SLOT(unaryOperatorClickedEng()));
-    Button *cosButton = createButton(tr("cos"), SLOT(unaryOperatorClickedEng()));
-    Button *tanButton = createButton(tr("tan"), SLOT(unaryOperatorClickedEng()));
-    Button *piButton = createButton(QString::fromUtf8("\u03C0"), SLOT(unaryOperatorClickedEng()));
-    Button *factButton = createButton(tr("n!"), SLOT(unaryOperatorClickedEng()));
-    Button *expButton = createButton(QString::fromUtf8("e\u207F"), SLOT(unaryOperatorClickedEng()));
-    Button *lnButton = createButton(tr("ln"), SLOT(unaryOperatorClickedEng()));
-    Button *logButton = createButton(tr("log"), SLOT(unaryOperatorClickedEng()));
-    Button *kubsqrtButton = createButton(QString::fromUtf8("\u00B3\u221A"), SLOT(unaryOperatorClickedEng()));
-    Button *to2Button = createButton(QString::fromUtf8("x\u00B2"), SLOT(unaryOperatorClickedEng()));
-    Button *to3Button = createButton(QString::fromUtf8("x\u00B3"), SLOT(unaryOperatorClickedEng()));
-    Button *toyButton = createButton(QString::fromUtf8("x\u207F"), SLOT(unaryOperatorClickedEng()));
-    Button *ysqrtButton = createButton(QString::fromUtf8("\u207F\u221A"), SLOT(unaryOperatorClickedEng()));
-
-
-    engineeringLayout = new QGridLayout(this);
-    engineeringLayout->setSpacing(0);
-    engineeringLayout->setContentsMargins(0, 0, 0, 0);
-
-    engineeringLayout->addWidget(sinhButton, 1, 0, 1, 4);
-    engineeringLayout->addWidget(coshAllButton, 2, 0, 1, 4);
-    engineeringLayout->addWidget(tanhButton, 0, 0, 1, 5);
-
-    engineeringWidget = new QWidget(this);
-    engineeringWidget->setLayout(engineeringLayout);
-
-    setWindowTitle(tr("Engineering Calculator"));
 }
 
-void MainWindow::SpawnSimpleMode();
-void MainWindow::SpawnEngineeringMode();
+void MainWindow::clearMemory()
+{
+    sumInMemory = 0.0;
+}
 
-void MainWindow::SwitchMode();
+void MainWindow::readMemory()
+{
+    display->setText(QString::number(sumInMemory));
+    waitingForOperand = true;
+}
+
+void MainWindow::setMemory()
+{
+    equalClicked();
+    sumInMemory = display->text().toDouble();
+}
+
+void MainWindow::addToMemory()
+{
+    equalClicked();
+    sumInMemory += display->text().toDouble();
+}
+
+Button *MainWindow::createButton(const QString &text, const char *member)
+ {
+     Button *button = new Button(text);
+     connect(button, SIGNAL(clicked()), this, member);
+     return button;
+ }
+void MainWindow::abortOperation()
+ {
+     clearAll();
+     display->setText(tr("Error"));
+ }
+
+bool MainWindow::calculate(double rightOperand, const QString &pendingOperator)
+{
+    if (pendingOperator == tr("+")) {
+        sumSoFar += rightOperand;
+    } else if (pendingOperator == tr("-")) {
+        sumSoFar -= rightOperand;
+    } else if (pendingOperator == tr("*")) {
+        factorSoFar *= rightOperand;
+    } else if (pendingOperator == tr("/")) {
+        if (rightOperand == 0.0)
+            return false;
+        factorSoFar /= rightOperand;
+    }
+    return true;
+}
+
+Button::Button(const QString &text, QWidget *parent)
+     : QToolButton(parent)
+ {
+     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+     setText(text);
+ }
+
+QSize Button::sizeHint() const
+ {
+     QSize size = QToolButton::sizeHint();
+     size.rheight() += 20;
+     size.rwidth() = qMax(size.width(), size.height());
+     return size;
+ }
+*/

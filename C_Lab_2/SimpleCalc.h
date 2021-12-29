@@ -17,14 +17,13 @@ public:
     QSize sizeHint() const;
 };
 
-class SimpleCalculator : public QDialog
- {
+class SimpleCalculator : public QWidget{
      Q_OBJECT
 
  public:
      SimpleCalculator(QWidget *parent = 0);
 
- private slots:
+ protected slots:
      void digitClicked();
      void unaryOperatorClicked();
      void additiveOperatorClicked();
@@ -38,9 +37,15 @@ class SimpleCalculator : public QDialog
      void addToMemory();
 
 protected:
+//     QWidget* defaultCalcWidget;
+//     QWidget* simpleCalcWidget;
+//     QWidget* engineeringCalcWidget;
+//     QWidget* mainWidget;
+
      QGridLayout* simpleCalcLayout;
-     QGridLayout* EngCalcLayout;
-     QGridLayout* mainLayout;
+//     QGridLayout* defaultCalcLayout;
+//     QGridLayout* engineeringCalcLayout;
+//     QGridLayout* mainLayout;
 
      QRadioButton *simpleCalc;
      QRadioButton *engineeringCalc;
