@@ -7,54 +7,80 @@
 #include <QGridLayout>
 #include <QDialog>
 #include <QRadioButton>
-#include "SimpleCalc.h"
-#include "EngineeringCalc.h"
+//#include "SimpleCalc.h"
+//#include "EngineeringCalc.h"
 
-class MainWindow : public QMainWindow
+class Button : public QToolButton
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    Button(const QString &text, QWidget *parent = 0);
+
+    QSize sizeHint() const;
+};
+
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    bool OnlyDigits();
+    void SetDigits(bool);
+
 private:
-//        QWidget* defaultCalcWidget;
-//        QWidget* simpleCalcWidget;
-//        QWidget* engineeringWidget;
-//        QWidget* mainWidget;
 
-//        QGridLayout* defaultCalcLayout;
-//        QGridLayout* simpleCalcLayout;
-//        QGridLayout* engineeringLayout;
-//        QGridLayout* mainLayout;
+    QWidget* defaultCalcWidget;
+    QWidget* simpleCalcWidget;
+    QWidget* engineeringCalcWidget;
+    QWidget* mainWidget;
 
-//        void CreateDefaultCalcWidget();
-       void CreateSimpleCalcWidget();
-       void CreateEngineeringWidget();
+    QGridLayout* defaultCalcLayout;
+    QGridLayout* simpleCalcLayout;
+    QGridLayout* engineeringCalcLayout;
+    QGridLayout* mainLayout;
 
-//        void SpawnSimpleMode();
-//        void SpawnEngineeringMode();
+    void CreateDefaultCalcWidget();
+    void CreateSimpleCalcWidget();
+    void CreateEngineeringCalcWidget();
 
-//             Button *createButton(const QString &text, const char *member);
-//             void abortOperation();
-//             bool calculate(double rightOperand, const QString &pendingOperator);
-//             double sumInMemory;
-//             double sumSoFar;
-//             double factorSoFar;
-//             QString pendingAdditiveOperator;
-//             QString pendingMultiplicativeOperator;
-//             bool waitingForOperand;
-//             QLineEdit *display;
-//             enum { NumDigitButtons = 10 };
-//             Button *digitButtons[NumDigitButtons];
+    void SpawnSimpleMode();
+    void SpawnComplMode();
 
-//             QRadioButton *simpleCalc;
-//             QRadioButton *engineeringCalc;
+    bool digits_only = true;
+
+    QRadioButton *simpleCalc;
+    QRadioButton *engineeringCalc;
+
+    Button *createButton(const QString &text, const char *member);
+    void abortOperation();
+    bool calculate(double rightOperand, const QString &pendingOperator);
+    double sumInMemory;
+    double sumSoFar;
+    double factorSoFar;
+    QString pendingAdditiveOperator;
+    QString pendingMultiplicativeOperator;
+    bool waitingForOperand;
+    QLineEdit *display;
+    enum { NumDigitButtons = 10 };
+    Button *digitButtons[NumDigitButtons];
 
 public slots:
-    //void SwitchMode();
+    void SwitchMode();
 
+    void digitClicked();
+    void unaryOperatorClicked();
+    void additiveOperatorClicked();
+    void multiplicativeOperatorClicked();
+    void equalClicked();
+    void pointClicked();
+    void clearAll();
+    void clearMemory();
+    void readMemory();
+    void setMemory();
+    void addToMemory();
 };
 #endif // MAINWINDOW_H
 
